@@ -1,26 +1,26 @@
-import React from 'react';
+import React, { useState } from 'react';
 import logo from './logo.svg';
 import './App.css';
 
 function App() {
+  const [userInput, setUserInput] = useState('type here');
+  const sampleText = 'hahaha type this';
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <BookText text={sampleText}></BookText>
+      <input 
+        type="text" 
+        value={userInput} 
+        onChange={event => setUserInput(event.target.value)}
+      />
+      {userInput === sampleText && <p>정확히 입력하셨습니다.</p>}
     </div>
   );
 }
 
+// JSX
+const BookText = (props) => <p>{props.text}</p>
+
 export default App;
+
