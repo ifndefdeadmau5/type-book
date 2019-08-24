@@ -1,14 +1,16 @@
 import React, { useState } from 'react';
 import logo from './logo.svg';
 import './App.css';
+import TopMenu from './components/topMenu';
 
 function App() {
   const [userInput, setUserInput] = useState('type here');
-  const sampleText = 'hahaha type this';
+  const sampleText = 'type this';
 
   return (
     <div className="App">
-      <BookText text={sampleText}></BookText>
+      <TopMenu />
+      <BookText text={sampleText} />
       <input 
         type="text" 
         value={userInput} 
