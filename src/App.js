@@ -1,9 +1,7 @@
 import React, { useState } from 'react';
-import logo from './logo.svg';
 import './App.css';
 import TopMenu from './components/topMenu';
 import { connect } from 'react-redux';
-import LinearDeterminate from './components/progress'; // progress bar
 import LinearProgress from '@material-ui/core/LinearProgress'; // progress bar
 
 const words = ['Apple', 'Banana', 'Carrot', 'Grape'];
@@ -14,7 +12,6 @@ function App({ count, increment, decrement }) {
   const [index, setIndex] = useState(0);
 
   const sampleText = 'type this';
-  const progressValue = 30;
 
   return (
     <div className="App">
