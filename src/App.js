@@ -1,18 +1,25 @@
 import React, { useState } from 'react';
+import { useQuery } from '@apollo/react-hooks';
+import { gql } from 'apollo-boost';
 import './App.css';
 import TopMenu from './components/topMenu';
-import { connect } from 'react-redux';
-import LinearProgress from '@material-ui/core/LinearProgress'; // progress bar
+import LinearProgress from '@material-ui/core/LinearProgress';
 
-const words = ['Apple', 'Banana', 'Carrot', 'Grape'];
 function App({ count, increment, decrement }) {
-  console.log('count');
-  console.log(count);
-  const [userInput, setUserInput] = useState('type here');
+  const [userInput, setUserInput] = useState('');
   const [index, setIndex] = useState(0);
+  const { loading, error, data } = useQuery(gql`
+    {
+      verses {
+        text
+      }
+    }
+  `);
 
-  const sampleText = 'type this';
+  if (loading) return <p>Loading...</p>;
+  if (error) return <p>Error :(</p>;
 
+  const words = data.verses.map(v => v.text);
   return (
     <div className="App">
       <TopMenu />
@@ -37,11 +44,7 @@ function App({ count, increment, decrement }) {
           Submit
         </button>
       </form>
-      {userInput === sampleText && <p>정확히 입력하셨습니다.</p>}
-      <h1>Count</h1>
-      <p>{count}</p>
-      <button onClick={() => increment()}>Increment</button>
-      <button onClick={() => decrement()}>Decrement</button>
+      {userInput === words[index] && <p>정확히 입력하셨습니다.</p>}
     </div>
   );
 }
@@ -49,21 +52,4 @@ function App({ count, increment, decrement }) {
 // JSX
 const BookText = props => <p>{props.text}</p>;
 
-export default connect(
-  state => ({
-    count: state,
-  }),
-  dispatch => {
-    console.log('say what');
-    return {
-      increment: () =>
-        dispatch({
-          type: 'INCREMENT',
-        }),
-      decrement: () =>
-        dispatch({
-          type: 'DECREMENT',
-        }),
-    };
-  },
-)(App);
+export default App;
