@@ -1,14 +1,42 @@
-import React, { useState } from 'react';
-import { useQuery } from '@apollo/react-hooks';
+import React, { useState, useEffect } from 'react';
+import { useLazyQuery } from '@apollo/react-hooks';
 import { gql } from 'apollo-boost';
+import styled from 'styled-components';
+import SwipeableViews from 'react-swipeable-views';
 import './App.css';
 import TopMenu from './components/topMenu';
 import LinearProgress from '@material-ui/core/LinearProgress';
+import TextField from '@material-ui/core/TextField';
+import Button from '@material-ui/core/Button';
+
+const SLIDE_HEIGHT = 300;
+const TextSlide = styled.div`
+  height: ${SLIDE_HEIGHT}px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+`;
+const Form = styled.form`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
+
+const styles = {
+  slideContainer: {
+    height: SLIDE_HEIGHT,
+  },
+  slide: {
+    padding: 15,
+    minHeight: 100,
+    color: '#fff',
+  },
+};
 
 function App({ count, increment, decrement }) {
   const [userInput, setUserInput] = useState('');
   const [index, setIndex] = useState(0);
-  const { loading, error, data } = useQuery(gql`
+  const [getVerses, { loading, data }] = useLazyQuery(gql`
     {
       verses {
         text
@@ -16,10 +44,13 @@ function App({ count, increment, decrement }) {
     }
   `);
 
-  if (loading) return <p>Loading...</p>;
-  if (error) return <p>Error :(</p>;
+  useEffect(() => {
+    getVerses();
+  }, [])
 
-  const words = data.verses.map(v => v.text);
+  if (loading) return <p>Loading...</p>;
+
+  const words = data ? data.verses.map(v => v.text) : [];
   return (
     <div className="App">
       <TopMenu />
@@ -27,29 +58,50 @@ function App({ count, increment, decrement }) {
         value={(index / words.length) * 100}
         variant="determinate"
       />
-      <BookText text={words[index]} />
-      <form>
-        <input
+      <SwipeableViews
+        containerStyle={styles.slideContainer}
+        axis="y"
+        enableMouseEvents
+        index={index}
+      >
+        {words.map(text => (
+          <div>
+            <BookText text={text} />
+          </div>
+        ))}
+      </SwipeableViews>
+      <Form>
+        <TextField
           type="text"
           value={userInput}
+          placeholder="Type here"
           onChange={event => setUserInput(event.target.value)}
+          margin="normal"
         />
-        <button
+        <Button
+          style={{ display: 'none' }}
+          type="submit"
+          variant="outlined"
           onClick={e => {
             e.preventDefault();
             setUserInput('');
+            if (userInput !== words[index]) return;
             setIndex(prev => prev + 1);
           }}
         >
-          Submit
-        </button>
-      </form>
+          전송
+        </Button>
+      </Form>
       {userInput === words[index] && <p>정확히 입력하셨습니다.</p>}
     </div>
   );
 }
 
 // JSX
-const BookText = props => <p>{props.text}</p>;
+const BookText = props => (
+  <TextSlide>
+    <p>{props.text}</p>
+  </TextSlide>
+);
 
 export default App;
