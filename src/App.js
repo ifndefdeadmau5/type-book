@@ -4,10 +4,10 @@ import { gql } from 'apollo-boost';
 import styled from 'styled-components';
 import SwipeableViews from 'react-swipeable-views';
 import './App.css';
-import TopMenu from './components/topMenu';
 import LinearProgress from '@material-ui/core/LinearProgress';
 import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
+import LoginPage from './pages/LoginPage';
 
 const SLIDE_HEIGHT = 300;
 const TextSlide = styled.div`
@@ -48,12 +48,14 @@ function App({ count, increment, decrement }) {
     getVerses();
   }, [])
 
+  const token = localStorage.getItem('token');
+
+  if (!token) return <LoginPage />;
   if (loading) return <p>Loading...</p>;
 
   const words = data ? data.verses.map(v => v.text) : [];
   return (
     <div className="App">
-      <TopMenu />
       <LinearProgress
         value={(index / words.length) * 100}
         variant="determinate"
